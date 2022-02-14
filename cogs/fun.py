@@ -18,8 +18,8 @@ class Fun(commands.Cog, Data):
         self.dictionary = PyDictionary()
 
         self.num_key = {"0":"zero", "1":"one", "2":"two", "3":"three", "4":"four", "5":"five", "6":"six", "7":"seven", "8":"eight", "9":"nine"}
-        self.ball_8_answers = self.retrieve("data\\8ball.json")
-        self.memes = self.retrieve("data\\memes.json")
+        self.ball_8_answers = self.retrieve("data/8ball.json")
+        self.memes = self.retrieve("data/memes.json")
 
         schedule.every(6).hours.do(self.refresh_memes_database_caller)
 
@@ -73,8 +73,8 @@ class Fun(commands.Cog, Data):
             if value not in filtered_memes.values():
                 filtered_memes[key] = value
 
-        self.update_changes("data\\memes.json", filtered_memes)
-        self.memes = self.retrieve("data\\memes.json")
+        self.update_changes("data/memes.json", filtered_memes)
+        self.memes = self.retrieve("data/memes.json")
 
         self.log("[INFO] [MEME] finished meme database refreshed\n")
         
@@ -161,7 +161,7 @@ class Fun(commands.Cog, Data):
 
     @commands.command()
     async def roll(self, ctx):
-        self.users = self.retrieve("data\\users.json")
+        self.users = self.retrieve("data/users.json")
         user_id = str(ctx.message.author.id)
         try:
             wallet = self.users[user_id]["wallet"]
@@ -188,11 +188,11 @@ class Fun(commands.Cog, Data):
 
             if player > comp:
                 self.users[user_id]["wallet"] += amnt 
-                self.update_changes("data\\users.json", self.users)
+                self.update_changes("data/users.json", self.users)
                 await ctx.reply(f"Banker rolled: ``{comp}`` \nYou rolled: ``{player}`` \nDamn son, you won ${amnt}")
             elif player < comp:
                 self.users[user_id]["wallet"] -= amnt 
-                self.update_changes("data\\users.json", self.users)
+                self.update_changes("data/users.json", self.users)
                 await ctx.reply(f"Banker rolled: ``{comp}`` \nYou rolled: ``{player}`` \nHaha, you lost ${amnt}")
             else:
                 await ctx.reply(f"Banker rolled: ``{comp}`` \nYou rolled: ``{player}`` \nwhew, that was a tie")

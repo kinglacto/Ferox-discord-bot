@@ -9,7 +9,7 @@ class Currency(commands.Cog, Data):
 
     @commands.command(aliases=["bal"])
     async def balance(self, ctx):
-        self.users = self.retrieve("data\\users.json")
+        self.users = self.retrieve("data/users.json")
         mentions = ctx.message.mentions
         if len(mentions) == 0:
             user_id = str(ctx.message.author.id)
@@ -35,7 +35,7 @@ class Currency(commands.Cog, Data):
 
     @commands.command(aliases=["dep"])
     async def deposit(self, ctx):
-        self.users = self.retrieve("data\\users.json")
+        self.users = self.retrieve("data/users.json")
         user_id = str(ctx.message.author.id)
         try:
             bank = self.users[user_id]["bank"]
@@ -58,7 +58,7 @@ class Currency(commands.Cog, Data):
                         amnt = wallet
                     self.users[user_id]["bank"] += amnt
                     self.users[user_id]["wallet"] -= amnt
-                    self.update_changes("data\\users.json", self.users)
+                    self.update_changes("data/users.json", self.users)
                     await ctx.reply(f"Deposited ${amnt}")
                 else:
                     await ctx.reply("Your bank is full")
@@ -71,7 +71,7 @@ class Currency(commands.Cog, Data):
                 if amnt <= (bank_space - bank):
                     self.users[user_id]["bank"] += amnt
                     self.users[user_id]["wallet"] -= amnt
-                    self.update_changes("data\\users.json", self.users)
+                    self.update_changes("data/users.json", self.users)
                     await ctx.reply(f"Deposited ${amnt}")
                 else:
                     await ctx.reply("You don't have enough bank space")
@@ -83,7 +83,7 @@ class Currency(commands.Cog, Data):
 
     @commands.command(aliases=["with"])
     async def withdraw(self, ctx):
-        self.users = self.retrieve("data\\users.json")
+        self.users = self.retrieve("data/users.json")
         user_id = str(ctx.message.author.id)
         try:
             bank = self.users[user_id]["bank"]
@@ -96,7 +96,7 @@ class Currency(commands.Cog, Data):
         if msg in ("max", "all"):
             self.users[user_id]["bank"] -= bank
             self.users[user_id]["wallet"] += bank
-            self.update_changes("data\\users.json", self.users)
+            self.update_changes("data/users.json", self.users)
             await ctx.reply(f"Withdrew ${bank}")
 
         elif msg.isdigit():
@@ -104,7 +104,7 @@ class Currency(commands.Cog, Data):
             if amnt <= bank:
                 self.users[user_id]["bank"] -= amnt
                 self.users[user_id]["wallet"] += amnt
-                self.update_changes("data\\users.json", self.users)
+                self.update_changes("data/users.json", self.users)
                 await ctx.reply(f"Withdrew ${amnt}")
             else:
                 await ctx.reply("You don't have that much money :0")
@@ -115,7 +115,7 @@ class Currency(commands.Cog, Data):
 
     @commands.command(aliases=["share"])
     async def give(self, ctx):
-        self.users = self.retrieve("data\\users.json")
+        self.users = self.retrieve("data/users.json")
         user_id = str(ctx.message.author.id)
         try:
             wallet = self.users[user_id]["wallet"]
@@ -140,7 +140,7 @@ class Currency(commands.Cog, Data):
                             amnt = wallet
                             self.users[user_id]["wallet"] -= amnt
                             self.users[str(mention_id)]["wallet"] += amnt
-                            self.update_changes("data\\users.json", self.users)
+                            self.update_changes("data/users.json", self.users)
                             await ctx.reply(f"You gave <@{mention_id}> ${amnt}")
                         else:
                             await ctx.reply("You don't have that much money")
@@ -150,7 +150,7 @@ class Currency(commands.Cog, Data):
                         if amnt <= wallet:
                             self.users[user_id]["wallet"] -= amnt
                             self.users[str(mention_id)]["wallet"] += amnt
-                            self.update_changes("data\\users.json", self.users)
+                            self.update_changes("data/users.json", self.users)
                             await ctx.reply(f"You gave <@{mention_id}> ${amnt}")
                         else:
                             await ctx.reply("You don't have that much money")

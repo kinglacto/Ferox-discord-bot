@@ -11,7 +11,7 @@ class Stocks(commands.Cog, Data):
 
     @commands.command()
     async def invest(self, ctx):
-        self.users = self.retrieve("data\\users.json")
+        self.users = self.retrieve("data/users.json")
         user_id = str(ctx.message.author.id)
         try:
             balance = self.users[user_id]["wallet"]
@@ -45,14 +45,14 @@ class Stocks(commands.Cog, Data):
             self.users[user_id]["investments"].append([symbol.upper(), amnt, price, invested_amnt, self.now.strftime("%d/%m/%Y")])
             self.users[user_id]["wallet"] -= invested_amnt
 
-            self.update_changes("data\\users.json", self.users)
+            self.update_changes("data/users.json", self.users)
 
             await ctx.reply(f"You bought {'{:,}'.format(amnt)} share(s) of {symbol} for ${'{:,}'.format(invested_amnt)}")
 
 
     @commands.command()
     async def sell(self, ctx):
-        self.users = self.retrieve("data\\users.json")
+        self.users = self.retrieve("data/users.json")
         user_id = str(ctx.message.author.id)
         try:
             i = self.users[user_id]["investments"]
@@ -91,7 +91,7 @@ class Stocks(commands.Cog, Data):
                     self.users[user_id]["investments"][index - 1][1] -= amnt
                     self.users[user_id]["wallet"] += sold
 
-                    self.update_changes("data\\users.json", self.users)
+                    self.update_changes("data/users.json", self.users)
 
                     await ctx.reply(f"You sold {'{:,}'.format(amnt)} share(s) of {symbol} for ${'{:,}'.format(sold)}")
                     return None
@@ -105,7 +105,7 @@ class Stocks(commands.Cog, Data):
 
     @commands.command()
     async def price(self, ctx):
-        self.users = self.retrieve("data\\users.json")
+        self.users = self.retrieve("data/users.json")
         msg = list(filter(None, str(ctx.message.content).split(" ")))
 
         try:
@@ -131,7 +131,7 @@ class Stocks(commands.Cog, Data):
 
     @commands.command(aliases=["port"])
     async def portfolio(self, ctx):
-        self.users = self.retrieve("data\\users.json")
+        self.users = self.retrieve("data/users.json")
         mentions = ctx.message.mentions
         if len(mentions) == 0:
             user_id = str(ctx.message.author.id)

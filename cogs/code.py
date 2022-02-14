@@ -6,7 +6,7 @@ class Code(commands.Cog, Data):
     def __init__(self, bot):
         Data.__init__(self)
         self.bot = bot
-        self.runtimes = self.retrieve("data\\runtimes.json")
+        self.runtimes = self.retrieve("data/runtimes.json")
 
     @commands.command()
     async def run(self, ctx):

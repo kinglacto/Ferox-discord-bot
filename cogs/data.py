@@ -26,7 +26,7 @@ class Data():
         file_opened.close()
 
     def register(self, user_id, user_name):
-        self.users = self.retrieve("data\\users.json")
+        self.users = self.retrieve("data/users.json")
         new_entry = {
             f"{user_id}":
                 {
@@ -38,7 +38,7 @@ class Data():
                 }
         }
 
-        users_local_file = open("data\\users.json", "r+")
+        users_local_file = open("data/users.json", "r+")
         self.users.update(new_entry)
         users_local_file.seek(0)
         json.dump(self.users, users_local_file)
@@ -46,13 +46,13 @@ class Data():
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.users = self.retrieve("data\\users.json")
+        self.users = self.retrieve("data/users.json")
         for member in list(self.bot.get_all_members()):
             if str(member.id) not in self.users:
                 self.register(member.id, str(member))
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        self.users = self.retrieve("data\\users.json")
+        self.users = self.retrieve("data/users.json")
         if str(member.id) not in self.users:
                 self.register(member.id, str(member))
