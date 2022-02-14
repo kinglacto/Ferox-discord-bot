@@ -1,0 +1,30 @@
+{
+    "deposit": {
+        "title": "deposit",
+        "description": "This command allows you to deposit the money have in\nyour wallet, into your bank.\n\nSyntax: ``pls deposit <amount>``\nAliases: ``dep``"
+    },
+    "withdraw": {
+        "title": "withdraw",
+        "description": "This command allows you to withdraw money from your bank,\ninto your wallet.\n\nSyntax: ``pls withdraw <amount>``\nAliases: ``with``"
+    },
+    "give": {
+        "title": "give",
+        "description": "This command allows you to share money in your wallet, with other\nregistered users.\n\nSyntax: ``pls give <amount> <@the-user's-tag>``\nAliases: ``share``"
+    },
+    "roll": {
+        "title": "roll",
+        "description": "This command allows you to gamble money in your\nwallet. You and the bot roll two dices and\nwhoever gets the higher sum wins double the\namount gambled.\n\nSyntax: ``pls roll <amount>``"
+    },
+    "invest": {
+        "title": "invest",
+        "description": "This command allows you to invest in stock. It uses the money\nin your wallet. You have to provid the company ticker symbol\nand the number of shares you want. The share prices are not\naccurate and the data is obtained from yfinance API, so all\nticker symbols may not work.\n\nSyntax: ``pls invest <company-ticker-symbol> <no-of-shares>``"
+    },
+    "sell": {
+        "title": "sell",
+        "description": "This command shows you to sell your stocks. You must also specify\nits index number in your portfolio.\n\nSyntax: ``pls sell <company-ticker-symbol> <no.-of-shares> <index>`` "
+    },
+    "price": {
+        "title": "price",
+        "description": "This command shows you to check a company's current share price\nand optionally the total amount it would cost to buy the\nspecified number of shares.\n<no.-of-shares> is optional\n\nSyntax: ``pls price <company-ticker-symbol> <no.-of-shares>`` "
+    }
+}
