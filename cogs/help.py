@@ -6,7 +6,7 @@ class Help(commands.Cog, Data):
     def __init__(self, bot):
         Data.__init__(self)
         self.bot = bot
-        self.help_embeds = self.retrieve("data\\help.json")
+        self.help_embeds = self.retrieve("data/help.json")
         self.command_aliases = {"dep": "deposit", "with":  "withdraw", "share": "give"}
     
     @commands.command()
