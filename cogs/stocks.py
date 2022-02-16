@@ -1,5 +1,5 @@
 from discord import Embed
-from cogs.data import Data
+from data import Data
 from discord.ext import commands
 import yfinance as yf
 
@@ -11,13 +11,13 @@ class Stocks(commands.Cog, Data):
 
     @commands.command()
     async def invest(self, ctx):
-        self.users = self.retrieve("data/users.json")
+        self.users = self.retrieve(self.users_path)
         user_id = str(ctx.message.author.id)
         try:
             balance = self.users[user_id]["wallet"]
         except:
-            self.register(user_id, str(ctx.message.author))
-            balance = self.users[user_id]["wallet"]
+            if self.register_user(ctx.message.author, str(ctx.message.author)):
+                balance = self.users[user_id]["wallet"]
 
         msg = list(filter(None, str(ctx.message.content).split(" ")))
 
@@ -42,41 +42,42 @@ class Stocks(commands.Cog, Data):
         if invested_amnt > balance:
             await ctx.reply("You don't have the necessary funds for that, Walmart Warren")
         else:
-            self.users[user_id]["investments"].append([symbol.upper(), amnt, price, invested_amnt, self.now.strftime("%d/%m/%Y")])
+            if symbol.upper() in self.users[user_id]["investments"]:
+                self.users[user_id]["investments"][1] += amnt
+                self.users[user_id]["investments"][2] += invested_amnt
+            else:
+                self.users[user_id]["investments"].append([symbol.upper(), amnt, invested_amnt])
+
             self.users[user_id]["wallet"] -= invested_amnt
 
-            self.update_changes("data/users.json", self.users)
+            self.update_changes(self.users_path, self.users)
 
             await ctx.reply(f"You bought {'{:,}'.format(amnt)} share(s) of {symbol} for ${'{:,}'.format(invested_amnt)}")
 
 
     @commands.command()
     async def sell(self, ctx):
-        self.users = self.retrieve("data/users.json")
+        self.users = self.retrieve(self.users_path)
         user_id = str(ctx.message.author.id)
         try:
-            i = self.users[user_id]["investments"]
+            self.users[user_id]["investments"]
         except:
-            self.register(user_id, str(ctx.message.author))
-            i = self.users[user_id]["investments"]
+            self.register_user(ctx.message.author, str(ctx.message.author))
 
         msg = list(filter(None, str(ctx.message.content).split(" ")))
 
         try:
-            symbol = msg[2]
+            symbol = msg[2].upper()
         
             if msg[3].strip().isdigit():
                 amnt = int(msg[3])
 
-            if msg[4].strip().isdigit():
-                index = int(msg[4])
         except:
             await ctx.reply("That ain't right. Type ``pls help sell`` to know more")
             return None
 
-        try:
-            i = i[index - 1]
-            if amnt <= i[1]:
+        if symbol in self.users[user_id]["investments"]:
+            if amnt < self.users[user_id]["investments"][1]:
                 try:
                     data = yf.download(tickers=symbol, period='2d', interval='60m')
                     price = round(data["Open"][3])
@@ -85,27 +86,26 @@ class Stocks(commands.Cog, Data):
                     return None
 
                 sold = round(price * amnt)
-                if i[1] - amnt == 0:
-                    del self.users[user_id]["investments"][index - 1]
-                else:
-                    self.users[user_id]["investments"][index - 1][1] -= amnt
-                    self.users[user_id]["wallet"] += sold
+                self.users[user_id]["investments"][symbol][1] -= amnt
+                self.users[user_id]["investments"]["wallet"] += sold
 
-                    self.update_changes("data/users.json", self.users)
+                if self.users[user_id]["investments"][symbol][1] == 0:
+                    del self.users[user_id]["investments"][symbol]
+                self.update_changes(self.users_path, self.users)
 
-                    await ctx.reply(f"You sold {'{:,}'.format(amnt)} share(s) of {symbol} for ${'{:,}'.format(sold)}")
-                    return None
-            else:
-                await ctx.reply(f"You don't have that many share(s)")
+                await ctx.reply(f"You sold {'{:,}'.format(amnt)} share(s) of {symbol} for ${'{:,}'.format(sold)}")
                 return None
-        except:
+            else:
+                await ctx.reply(f"You don't have those many shares in {symbol}")
+            return None
+        else:
             await ctx.reply(f"You haven't invested in {symbol}")
             return None
 
 
     @commands.command()
     async def price(self, ctx):
-        self.users = self.retrieve("data/users.json")
+        self.users = self.retrieve(self.users_path)
         msg = list(filter(None, str(ctx.message.content).split(" ")))
 
         try:
@@ -131,24 +131,25 @@ class Stocks(commands.Cog, Data):
 
     @commands.command(aliases=["port"])
     async def portfolio(self, ctx):
-        self.users = self.retrieve("data/users.json")
+        self.users = self.retrieve(self.users_path)
         mentions = ctx.message.mentions
         if len(mentions) == 0:
-            user_id = str(ctx.message.author.id)
+            user = ctx.message.author.id
         else:
-            user_id = str(mentions[0].id)
-
+            user = mentions[0]
+            
+        user_id = str(user.id)
         try:
-            investments = self.users[str(user_id)]["investments"]
+            investments = self.users[user_id]["investments"]
         except:
-            name = await self.bot.fetch_user(int(user_id))
-            self.register(user_id, str(name))
-            investments = self.users[str(user_id)]["investments"]
+            name = await self.bot.fetch_user(int(user.id))
+            if self.register_user(user, str(name)):
+                investments = self.users[user_id]["investments"]
 
-        user_name = ''.join(list(str(self.users[str(user_id)]["user_name"]))[:-5])
+        user_name = ''.join(list(str(self.users[user_id]["user_name"]))[:-5])
         doc = ""
         for n, i in enumerate(investments):
-            doc += f"{n+1}) **{i[0]}** : **{i[1]}** share(s) - ${i[2]} per share /{i[1]} for ${i[3]} {i[4]}\n"
+            doc += f"{n+1}) **{i[0]}** : **{i[1]}** share(s) - **${i[2]}**\n"
 
         embed = Embed(title=f"{user_name}'s Portfolio:", description=f"{doc}", color=0x008508)
         await ctx.reply(embed=embed)

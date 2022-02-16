@@ -26,6 +26,8 @@ class Connect4():
         self.previous_player = player if self.current_player == self.opponent else self.opponent
         self.doc = ""
 
+        self.depth = 5
+
         self.buttons = [
             Button(label="1", style=ButtonStyle.blurple, custom_id="1", row=0),
             Button(label="2", style=ButtonStyle.blurple, custom_id="2", row=0),
@@ -195,25 +197,26 @@ class Connect4():
 
     def get_best_move(self) -> tuple:
         self.opponent_color = self.turn * -1
-        return self.minimax(5, -10000000, 10000000, True)[1]
+        return self.minimax(self.depth, -10000000, 10000000, True)[1]
 
     def minimax(self, depth, alpha, beta, is_maximising) -> list:
         all_valid_moves = self.get_all_valid_moves()
+        random.shuffle(all_valid_moves)
         winner = self.check_for_winner()
         is_draw = self.is_draw()
         
         if depth == 0 or (winner in (1, -1) or is_draw):
             if winner == self.turn:
-                return 100000, None
-            elif winner == self.opponent_color:
-                return -100000, None
+                return 10000, None
+            elif winner == self.opponent:
+                return -10000, None
             elif is_draw:
                 return 0, None
             else:
                 return self.heuristic(), None
 
         if is_maximising:
-            best_score = -10000000
+            best_score = -100000
             best_move = None
             for move in all_valid_moves:
                 self.board[move[0]][move[1]] = self.turn
@@ -226,12 +229,12 @@ class Connect4():
                 if alpha >= beta:
                     break
             return best_score, best_move
-        
+
         else:
-            best_score = 10000000
+            best_score = 100000
             best_move = None
             for move in all_valid_moves:
-                self.board[move[0]][move[1]] = self.opponent_color
+                self.board[move[0]][move[1]] = self.opponent
                 score = self.minimax(depth - 1, alpha, beta, True)[0]
                 self.board[move[0]][move[1]] = 0
                 if score < best_score:
@@ -244,29 +247,26 @@ class Connect4():
 
     def heuristic(self) -> int:
         score = 0
-        if self.board[5][3] == 0:
-            score += 1000
-        elif self.board[5][3] == self.opponent_color:
-            score -= 1000
-
         for i in range(6):
-            if self.board[i][4] == 0:
+            if self.board[i][3] == self.turn:
                 score += 100
+            elif self.board[i][3] == self.opponent:
+                score -= 100
 
-        if self.board[0][0] == 0 or self.board[0][6] == 0 or self.board[5][0] == 0 or self.board[5][6] == 0:
+        if self.board[0][0] == self.turn or self.board[0][6] == self.turn or self.board[5][0] == self.turn or self.board[5][6] == self.turn:
             score += 10
-        if self.board[0][0] == self.opponent_color or self.board[0][6] == self.opponent_color or self.board[5][0] == self.opponent_color or self.board[5][6] == self.opponent_color:
-            score += 10
+        if self.board[0][0] == self.opponent or self.board[0][6] == self.opponent or self.board[5][0] == self.opponent or self.board[5][6] == self.opponent:
+            score -= 10
 
         for i in range(6):
             for j in range(7):
                 n = 1 if self.board[i][j] == self.turn else -1
                 if i <= 4 and (self.board[i][j] == self.board[i + 1][j] != 0) and (self.is_valid((i + 2, j)) or self.is_valid((i - 1, j))):
-                    score += n * 100
+                    score += n * 50
                 if i <= 3 and (self.board[i][j] == self.board[i + 1][j] == self.board[i + 2][j] != 0) and (self.is_valid((i + 3, j)) or self.is_valid((i - 1, j))):
                     score += n * 100
                 if i >= 1 and (self.board[i][j] == self.board[i - 1][j] != 0) and (self.is_valid((i - 2, j)) or self.is_valid((i + 1, j))):
-                    score += n * 100
+                    score += n * 50
                 if i >= 2 and (self.board[i][j] == self.board[i - 1][j] == self.board[i - 2][j] != 0) and (self.is_valid((i - 3, j)) or self.is_valid((i + 1, j))):
                     score += n * 100
                 if j <= 5 and (self.board[i][j] == self.board[i][j + 1] != 0) and (self.is_valid((i, j + 2))):

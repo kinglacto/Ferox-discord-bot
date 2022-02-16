@@ -5,3 +5,5 @@ PyDictionary==2.0.1
 requests==2.27.1
 schedule==1.1.0
 yfinance==0.1.69
+python-dotenv==0.19.2
+mysl-connector-python==8.0.28

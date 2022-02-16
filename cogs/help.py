@@ -1,12 +1,12 @@
 from discord import Embed
 from discord.ext import commands
-from cogs.data import Data
+from data import Data
 
 class Help(commands.Cog, Data):
     def __init__(self, bot):
         Data.__init__(self)
         self.bot = bot
-        self.help_embeds = self.retrieve("data/help.json")
+        self.help_embeds = self.retrieve(self.help_path)
         self.command_aliases = {"dep": "deposit", "with":  "withdraw", "share": "give"}
     
     @commands.command()

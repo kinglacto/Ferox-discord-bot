@@ -1,12 +1,12 @@
 import requests
-from cogs.data import Data
+from data import Data
 from discord.ext import commands
 
 class Code(commands.Cog, Data):
     def __init__(self, bot):
         Data.__init__(self)
         self.bot = bot
-        self.runtimes = self.retrieve("data/runtimes.json")
+        self.runtimes = self.retrieve(self.runtimes_path)
 
     @commands.command()
     async def run(self, ctx):
