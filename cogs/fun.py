@@ -1,13 +1,15 @@
 import json
 import random
-import requests
-import schedule
 import threading
 import os
+
+import requests
+import schedule
 from PyDictionary import PyDictionary
 from discord import Embed, ButtonStyle
 from discord.ui import Button, View
 from discord.ext import commands
+
 from data import Data
 
 class Fun(commands.Cog, Data):

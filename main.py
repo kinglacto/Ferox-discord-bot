@@ -1,7 +1,9 @@
 import os
+
 from dotenv import load_dotenv
 from discord import Intents
 from discord.ext import commands
+
 from cogs.register import Register
 from cogs.help import Help
 from cogs.stocks import Stocks

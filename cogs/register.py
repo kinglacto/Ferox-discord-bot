@@ -1,4 +1,5 @@
 from discord.ext import commands
+
 from data import Data
 
 class Register(commands.Cog, Data):

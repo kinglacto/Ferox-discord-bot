@@ -1,7 +1,8 @@
-from discord import Embed
-from data import Data
-from discord.ext import commands
 import yfinance as yf
+from discord import Embed
+from discord.ext import commands
+
+from data import Data
 
 
 class Stocks(commands.Cog, Data):

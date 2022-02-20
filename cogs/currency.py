@@ -1,6 +1,7 @@
 from discord import Embed
-from data import Data
 from discord.ext import commands
+
+from data import Data
 
 class Currency(commands.Cog, Data):
     def __init__(self, bot):

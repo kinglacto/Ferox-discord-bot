@@ -1,6 +1,8 @@
 import requests
-from data import Data
+
 from discord.ext import commands
+
+from data import Data
 
 class Code(commands.Cog, Data):
     def __init__(self, bot):
