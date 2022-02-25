@@ -11,7 +11,7 @@ class Stocks(commands.Cog, Data):
         self.bot = bot
 
     @commands.command()
-    async def invest(self, ctx):
+    async def invest(self, ctx, symbol=None, num_of_shares="1"):
         self.users = self.retrieve(self.users_path)
         user_id = str(ctx.message.author.id)
         try:
@@ -20,44 +20,44 @@ class Stocks(commands.Cog, Data):
             if self.register_user(ctx.message.author, str(ctx.message.author)):
                 balance = self.users[user_id]["wallet"]
 
-        msg = list(filter(None, str(ctx.message.content).split(" ")))
-
-        try:
-            symbol = msg[2]
-
-            if msg[3].strip().isdigit():
-                amnt = int(msg[3])
-        except:
-            await ctx.reply("That ain't right. Type ``pls help invest`` to know more")
+        if symbol is None:
+            await ctx.reply("Invalid symbol. Type ``pls help price`` to know more")
+            return None
+        else:
+            symbol = symbol.upper()
+        
+        if type(num_of_shares) == int or num_of_shares.isdigit():
+            num_of_shares = int(num_of_shares)
+            try:
+                price = round(yf.download(tickers=symbol, period='2d', interval='60m')["Open"][-1], 2)
+            except:
+                await ctx.reply("Invalid symbol... or it could just be me glitching")
+                return None
+        else:
+            await ctx.reply("Is that even a number, bruh? Type ``pls help invest`` to know more")
             return None
 
-        try:
-            data = yf.download(tickers=symbol, period='2d', interval='60m')
-            price = round(data["Open"][3])
-        except:
-            await ctx.reply("Invalid symbol... or it could just be me glitching")
-            return None
-    
-        invested_amnt = round(price * amnt)
+        invested_amnt = price * num_of_shares
 
         if invested_amnt > balance:
             await ctx.reply("You don't have the necessary funds for that, Walmart Warren")
         else:
-            if symbol.upper() in self.users[user_id]["investments"]:
-                self.users[user_id]["investments"][1] += amnt
-                self.users[user_id]["investments"][2] += invested_amnt
+            if symbol in self.users[user_id]["investments"]:
+                self.users[user_id]["investments"][symbol]["num"] += num_of_shares
+                self.users[user_id]["investments"][symbol]["amnt"] += invested_amnt
             else:
-                self.users[user_id]["investments"].append([symbol.upper(), amnt, invested_amnt])
+                self.users[user_id]["investments"][symbol] = {
+                    "num" : num_of_shares,
+                    "amnt" : invested_amnt
+                }
 
             self.users[user_id]["wallet"] -= invested_amnt
-
             self.update_changes(self.users_path, self.users)
 
-            await ctx.reply(f"You bought {'{:,}'.format(amnt)} share(s) of {symbol} for ${'{:,}'.format(invested_amnt)}")
-
+            await ctx.reply(f"You bought {'{:,}'.format(num_of_shares)} share(s) of {symbol} for ${'{:,}'.format(invested_amnt)}")
 
     @commands.command()
-    async def sell(self, ctx):
+    async def sell(self, ctx, symbol=None, num_of_shares="1"):
         self.users = self.retrieve(self.users_path)
         user_id = str(ctx.message.author.id)
         try:
@@ -65,36 +65,35 @@ class Stocks(commands.Cog, Data):
         except:
             self.register_user(ctx.message.author, str(ctx.message.author))
 
-        msg = list(filter(None, str(ctx.message.content).split(" ")))
+        if symbol is None:
+            await ctx.reply("Invalid symbol. Type ``pls help price`` to know more")
+            return None
+        else:
+            symbol = symbol.upper()
 
-        try:
-            symbol = msg[2].upper()
-        
-            if msg[3].strip().isdigit():
-                amnt = int(msg[3])
-
-        except:
-            await ctx.reply("That ain't right. Type ``pls help sell`` to know more")
+        if type(num_of_shares) == int or num_of_shares.isdigit():
+            num_of_shares = int(num_of_shares)
+        else:
+            await ctx.reply("Is that even a number, bruh? Type ``pls help invest`` to know more")
             return None
 
         if symbol in self.users[user_id]["investments"]:
-            if amnt < self.users[user_id]["investments"][1]:
+            if num_of_shares <= self.users[user_id]["investments"][symbol]["num"]:
                 try:
-                    data = yf.download(tickers=symbol, period='2d', interval='60m')
-                    price = round(data["Open"][3])
+                    price = round(yf.download(tickers=symbol, period='2d', interval='60m')["Open"][-1], 2)
                 except:
                     await ctx.reply("Invalid symbol... or it could just be me glitching")
                     return None
 
-                sold = round(price * amnt)
-                self.users[user_id]["investments"][symbol][1] -= amnt
-                self.users[user_id]["investments"]["wallet"] += sold
+                sold_amnt = price * num_of_shares
+                self.users[user_id]["investments"][symbol]["num"] -= num_of_shares
+                self.users[user_id]["wallet"] += sold_amnt
 
-                if self.users[user_id]["investments"][symbol][1] == 0:
+                if self.users[user_id]["investments"][symbol]["num"] == 0:
                     del self.users[user_id]["investments"][symbol]
                 self.update_changes(self.users_path, self.users)
 
-                await ctx.reply(f"You sold {'{:,}'.format(amnt)} share(s) of {symbol} for ${'{:,}'.format(sold)}")
+                await ctx.reply(f"You sold {'{:,}'.format(num_of_shares)} share(s) of {symbol} for ${'{:,}'.format(sold_amnt)}")
                 return None
             else:
                 await ctx.reply(f"You don't have those many shares in {symbol}")
@@ -105,37 +104,28 @@ class Stocks(commands.Cog, Data):
 
 
     @commands.command()
-    async def price(self, ctx):
-        self.users = self.retrieve(self.users_path)
-        msg = list(filter(None, str(ctx.message.content).split(" ")))
-
-        try:
-            symbol = msg[2]
-        except:
-            await ctx.reply("That ain't right. Type ``pls help price`` to know more")
+    async def price(self, ctx, symbol=None, num_of_shares="1"):
+        if symbol is None:
+            await ctx.reply("Invalid symbol. Type ``pls help price`` to know more")
             return None
     
         try:
-            data = yf.download(tickers=symbol, period='2d', interval='60m')
-            price = round(data["Open"][3])
+            price = round(yf.download(tickers=symbol, period='2d', interval='60m')["Open"][-1], 2)
         except:
             await ctx.reply("Invalid symbol... or it could just be me glitching")
             return None
 
-        if len(msg) == 3:
-            await ctx.reply(f"{symbol}'s current share price is ${price}")
+        if type(num_of_shares) == int or num_of_shares.isdigit():
+            await ctx.reply(f"{symbol}'s current share price is ${price} \n{num_of_shares} share(s) would cost you ${'{:,}'.format(int(num_of_shares) * price)}") 
         else:
-            if msg[3].isdigit():
-               await ctx.reply(f"{symbol}'s current share price is ${price} \n{msg[3]} shares would cost you ${'{:,}'.format(int(msg[3]) * price)}") 
-            else:
-                await ctx.reply("Invalid amount")
+            await ctx.reply("Invalid amount")
 
     @commands.command(aliases=["port"])
     async def portfolio(self, ctx):
         self.users = self.retrieve(self.users_path)
         mentions = ctx.message.mentions
         if len(mentions) == 0:
-            user = ctx.message.author.id
+            user = ctx.message.author
         else:
             user = mentions[0]
             
@@ -149,8 +139,9 @@ class Stocks(commands.Cog, Data):
 
         user_name = ''.join(list(str(self.users[user_id]["user_name"]))[:-5])
         doc = ""
-        for n, i in enumerate(investments):
-            doc += f"{n+1}) **{i[0]}** : **{i[1]}** share(s) - **${i[2]}**\n"
+        for index, symbol in enumerate(investments):
+            num, amnt = investments[symbol]["num"], investments[symbol]["amnt"]
+            doc += f"{index + 1}) **{symbol}** : **{num}** share(s) - **${amnt}**\n"
 
         embed = Embed(title=f"{user_name}'s Portfolio:", description=f"{doc}", color=0x008508)
         await ctx.reply(embed=embed)

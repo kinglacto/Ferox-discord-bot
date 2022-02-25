@@ -32,7 +32,7 @@ class Data():
                             "wallet": 1000,
                             "bank": 10000,
                             "bank_space": 1000000,
-                            "investments": []
+                            "investments": {}
                         }
                 }
                 self.users.update(new_entry)
