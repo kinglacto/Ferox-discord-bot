@@ -25,13 +25,14 @@ class Fun(commands.Cog, Data):
         self.ball_8_answers = self.retrieve(self.ball8_path)
         self.memes = self.retrieve(self.memes_path)
 
-        schedule.every(6).hours.do(self.refresh_memes_database_caller)
+        self.refresh_memes_database_caller()
+        schedule.every(10).minutes.do(self.refresh_memes_database_caller)
 
     def refresh_memes_database_caller(self):
         threading.Thread(target=self.refresh_memes_database).start()
         
     def refresh_memes_database(self):
-        memes = self.memes
+        memes = {}
         try:
             self.reddit_auth = requests.auth.HTTPBasicAuth(os.getenv('REDDIT_CLIENT_ID'), os.getenv('REDDIT_API_SECRET_KEY'))
             self.reddit_data = {'grant_type': 'password',
@@ -43,37 +44,31 @@ class Fun(commands.Cog, Data):
         except:
             return None
 
-        for name in ("memes", "Memes_Of_The_Dank", "MemesIRL", "DankMemesFromSite19", "goodanimemes"):
-            for time_frame in ("hour", "day"):
-                for listing in ("best", "hot", "top"):
-                    try:
-                        res = requests.get(f'https://oauth.reddit.com/r/{name}/{listing}.json?limit=100&t={time_frame}', headers=self.headers).json()
-                        for post in res["data"]["children"][2:]:
+        for name in ("memes", "Memes_Of_The_Dank", "MemesIRL"):
+            for listing in ("best", "hot", "top"):
+                try:
+                    res = requests.get(f'https://oauth.reddit.com/r/{name}/{listing}.json?limit=100&t=hour', headers=self.headers).json()
+                    for post in res["data"]["children"][2:]:
+                        try:
+                            if "images" in post["data"]["preview"]:
+                                link = post["data"]["url_overridden_by_dest"]
+                                if link not in memes and link[-4:] in (".png", ".jpg"):
+                                    memes[link] = post["data"]["title"]
+                        except:
                             try:
-                                if "images" in post["data"]["preview"]:
-                                    link = post["data"]["url_overridden_by_dest"]
-                                    if link not in memes and link[-4:] in (".png", ".jpg"):
+                                if "gif" in post["data"]["preview"]["variants"]:
+                                    link = post["data"]["preview"]["variants"]["gif"]["source"]["url"]
+                                    if link not in memes and link[-4:] in (".gif"):
                                         memes[link] = post["data"]["title"]
                             except:
-                                try:
-                                    if "gif" in post["data"]["preview"]["variants"]:
-                                        link = post["data"]["preview"]["variants"]["gif"]["source"]["url"]
-                                        if link not in memes and link[-4:] in (".gif"):
-                                            memes[link] = post["data"]["title"]
-                                except:
-                                    pass
-                    except:
-                        pass
+                                pass
+                except:
+                    pass
 
         while len(memes) > 500:
             memes.popitem()
 
-        filtered_memes = {}
-        for key,value in memes.items():
-            if value not in filtered_memes.values():
-                filtered_memes[key] = value
-
-        self.update_changes(self.memes_path, filtered_memes)
+        self.update_changes(self.memes_path, memes)
         self.memes = self.retrieve(self.memes_path)
         
     @commands.command()
@@ -157,7 +152,7 @@ class Fun(commands.Cog, Data):
             await ctx.reply("I ain't showing you a gif")
 
     @commands.command()
-    async def roll(self, ctx):
+    async def roll(self, ctx, amount):
         self.users = self.retrieve(self.users_path)
         user_id = str(ctx.message.author.id)
         try:
@@ -166,47 +161,50 @@ class Fun(commands.Cog, Data):
             self.register_user(ctx.message.author, str(ctx.message.author))
             wallet = self.users[user_id]["wallet"]
 
-        amnt = list(filter(None, str(ctx.message.content).split(" ")))[2]
+        if amount is None:
+            await ctx.reply("how much do you wanna gamble?")
+            return None
+        elif amount in ("all", "max"):
+            amount = wallet
+        elif type(amount) == int or amount.isdigit():
+            amount = int(amount)
+        else:
+            await ctx.reply("Invalid amount")
+            return None
 
         if wallet > 0:
-            if amnt.isdigit():
-                amnt = int(amnt)
-                if amnt > wallet:
-                    await ctx.reply("You don't even have that much, fool")
-                    return None
-            elif amnt in ("all", "max"):
-                amnt = wallet
-            else:
-                await ctx.reply("Stop wasting my time with invalid amounts")
-                return None
-
             player = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
             comp = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
 
             if player > comp:
-                self.users[user_id]["wallet"] += amnt 
+                self.users[user_id]["wallet"] += amount 
                 self.update_changes(self.users_path, self.users)
-                await ctx.reply(f"Banker rolled: ``{comp}`` \nYou rolled: ``{player}`` \nDamn son, you won ${amnt}")
+                await ctx.reply(f"Banker rolled: ``{comp}`` \nYou rolled: ``{player}`` \nDamn son, you won ${amount}")
             elif player < comp:
-                self.users[user_id]["wallet"] -= amnt 
+                self.users[user_id]["wallet"] -= amount 
                 self.update_changes(self.users_path, self.users)
-                await ctx.reply(f"Banker rolled: ``{comp}`` \nYou rolled: ``{player}`` \nHaha, you lost ${amnt}")
+                await ctx.reply(f"Banker rolled: ``{comp}`` \nYou rolled: ``{player}`` \nHaha, you lost ${amount}")
             else:
                 await ctx.reply(f"Banker rolled: ``{comp}`` \nYou rolled: ``{player}`` \nwhew, that was a tie")
         else:
             await ctx.reply("You have no money to gamble, you peasant")
     
     @commands.command()
-    async def meaning(self, ctx):
-        word = list(filter(None, str(ctx.message.content).split(" ")))[2]
-        dic = self.dictionary.meaning(word)
-        if dic == None:
+    async def meaning(self, ctx, word):
+        if word is None:
+            await ctx.reply("Enter a word")
+            return None
+
+        res = self.dictionary.meaning(word)
+
+        if res == None:
             await ctx.reply("Not a valid word")
             return None
+
         doc = f"**__{word}__**\n\n"
-        for i in dic:
+        for i in res:
             doc += f"**{i}**"
-            for num, j in enumerate(dic[i]):
+            for num, j in enumerate(res[i]):
                 if num == 3:
                     break
                 doc += f"\n*{num + 1}) {j}*"    
