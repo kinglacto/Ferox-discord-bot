@@ -5,7 +5,8 @@ class Data():
     def __init__(self):
         self.now = datetime.now()
         self.users_path = "data/users.json"
-        self.help_path = "data/help.json"
+        self.help_category_path = "data/help_category.json"
+        self.help_commands_path = "data/help_commands.json"
         self.ball8_path = "data/8ball.json"
         self.memes_path = "data/memes.json"
         self.runtimes_path = "data/runtimes.json"

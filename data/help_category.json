@@ -1,0 +1,64 @@
+{
+    "help" : {
+        "title" : "Commands",
+        "fields": {
+            "Currency":  "- To view all the currency commands",
+            "Fun" : " - To view all the fun commands",
+            "Stocks" : " - To view all the stock related commands",
+            "Games" : " - To view all the games",
+            "Code" : "- To view all the programming commands"
+        },
+        "footer": "pls <CATEGORY_NAME> to know more"
+    },
+
+    "Currency" : {
+        "title" : "Currency Commands",
+        "fields" : {
+            "balance" : " - To check your balance. Tag someone to check theirs",
+            "deposit" : " - To deposit money into your bank",
+            "withdraw" : " - To withdraw money from your bank",
+            "give" : " - To give money to someone"
+        },
+        "footer" : "pls help <CMD_NAME> to know more"
+    },
+
+    "Fun" : {
+        "title" : "Fun Commands",
+        "fields" : {
+            "meme" : "- To view memes",
+            "gif" : " - Sends a gif",
+            "roll" : " - Gamble your money",
+            "meaning" : " - find a word's meaning",
+            "emojify" : "- emojify your text",
+            "8ball" : "- Ask 8ball a question"
+        },
+        "footer" : "pls help <CMD_NAME> to know more"
+    },
+
+    "Stocks": {
+        "title" : "Stock Commands",
+        "fields" : {
+            "invest" : " - To invest into a stock",
+            "sell" : " - To sell your shares",
+            "price" : " - To check the current price of a stock",
+            "portfolio" : " - To view your portfolio"
+        },
+        "footer" : "pls help <CMD_NAME> to know more"
+    },
+
+    "Games": {
+        "title" : "Games",
+        "fields" : {
+            "connect4" : " - To play connect4, ping the person ``pls c4 @user`` or ``pls c4`` to play with the bot"
+        },
+        "footer" : "pls help <CMD_NAME> to know more"
+    },
+
+    "Code" : {
+        "title" : "Code",
+        "fields" : {
+            "run" : "``pls run language-name`` and code within code blocks in the next line"
+        },
+        "footer" : "pls help <CMD_NAME> to know more"
+    }
+}

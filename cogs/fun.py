@@ -26,7 +26,7 @@ class Fun(commands.Cog, Data):
         self.memes = self.retrieve(self.memes_path)
 
         self.refresh_memes_database_caller()
-        schedule.every(10).minutes.do(self.refresh_memes_database_caller)
+        schedule.every(5).minutes.do(self.refresh_memes_database_caller)
 
     def refresh_memes_database_caller(self):
         threading.Thread(target=self.refresh_memes_database).start()

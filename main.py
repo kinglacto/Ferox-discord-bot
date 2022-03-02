@@ -4,13 +4,13 @@ from dotenv import load_dotenv
 from discord import Intents
 from discord.ext import commands
 
-from cogs.register import Register
+from cogs.register_users import Register
 from cogs.help import Help
 from cogs.stocks import Stocks
 from cogs.currency import Currency   
 from cogs.fun import Fun
 from cogs.games import Games
-from cogs.code import Code
+from cogs.run_code import Code
 
 def main():
     load_dotenv()
@@ -20,7 +20,7 @@ def main():
 
     bot = commands.Bot(command_prefix="pls ", help_command=None, intents=intents)
     
-    bot.add_cog(Register(bot))
+    bot.add_cog(Register(bot))  
     bot.add_cog(Help(bot))
     bot.add_cog(Stocks(bot))
     bot.add_cog(Currency(bot))

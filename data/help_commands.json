@@ -21,7 +21,7 @@
     },
     "sell": {
         "title": "sell",
-        "description": "This command shows you to sell your stocks. \n\nSyntax: ``pls sell <company-ticker-symbol> <no.-of-shares>`` "
+        "description": "This command allows you to sell your stocks. \n\nSyntax: ``pls sell <company-ticker-symbol> <no.-of-shares>`` "
     },
     "price": {
         "title": "price",
