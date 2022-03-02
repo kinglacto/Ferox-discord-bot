@@ -52,6 +52,10 @@ class Help(commands.Cog, Data):
     async def Stocks(self, ctx):
         await ctx.reply(embed=self.category_embeds["Stocks"])
 
+    @commands.command(aliases=["moderation"])
+    async def Moderation(self, ctx):
+        await ctx.reply(embed=self.category_embeds["Moderation"])
+
     @commands.command(aliases=["games"])
     async def Games(self, ctx):
         await ctx.reply(embed=self.category_embeds["Games"])

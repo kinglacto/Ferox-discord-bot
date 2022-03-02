@@ -5,6 +5,7 @@
             "Currency":  "- To view all the currency commands",
             "Fun" : " - To view all the fun commands",
             "Stocks" : " - To view all the stock related commands",
+            "Moderation" : " - To view all moderation commands",
             "Games" : " - To view all the games",
             "Code" : "- To view all the programming commands"
         },
@@ -42,6 +43,17 @@
             "sell" : " - To sell your shares",
             "price" : " - To check the current price of a stock",
             "portfolio" : " - To view your portfolio"
+        },
+        "footer" : "pls help <CMD_NAME> to know more"
+    },
+
+    "Moderation": {
+        "title" : "Moderation Commands",
+        "fields" : {
+            "lock" : " - To lock a particular channel",
+            "unlock" : " - To unlock a particular channel",
+            "lockdown" : " - To lock all categories",
+            "lift" : " - To unlock all categories"
         },
         "footer" : "pls help <CMD_NAME> to know more"
     },

@@ -11,6 +11,7 @@ from cogs.currency import Currency
 from cogs.fun import Fun
 from cogs.games import Games
 from cogs.run_code import Code
+from cogs.moderation import Moderation
 
 def main():
     load_dotenv()
@@ -20,6 +21,7 @@ def main():
 
     bot = commands.Bot(command_prefix="pls ", help_command=None, intents=intents)
     
+    bot.add_cog(Moderation(bot))
     bot.add_cog(Register(bot))  
     bot.add_cog(Help(bot))
     bot.add_cog(Stocks(bot))
