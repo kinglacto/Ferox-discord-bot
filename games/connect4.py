@@ -208,7 +208,7 @@ class Connect4():
         if depth == 0 or (winner in (1, -1) or is_draw):
             if winner == self.turn:
                 return 10000, None
-            elif winner == self.opponent:
+            elif winner == self.opponent_color:
                 return -10000, None
             elif is_draw:
                 return 0, None
@@ -234,7 +234,7 @@ class Connect4():
             best_score = 100000
             best_move = None
             for move in all_valid_moves:
-                self.board[move[0]][move[1]] = self.opponent
+                self.board[move[0]][move[1]] = self.opponent_color
                 score = self.minimax(depth - 1, alpha, beta, True)[0]
                 self.board[move[0]][move[1]] = 0
                 if score < best_score:
@@ -250,12 +250,12 @@ class Connect4():
         for i in range(6):
             if self.board[i][3] == self.turn:
                 score += 100
-            elif self.board[i][3] == self.opponent:
+            elif self.board[i][3] == self.opponent_color:
                 score -= 100
 
         if self.board[0][0] == self.turn or self.board[0][6] == self.turn or self.board[5][0] == self.turn or self.board[5][6] == self.turn:
             score += 10
-        if self.board[0][0] == self.opponent or self.board[0][6] == self.opponent or self.board[5][0] == self.opponent or self.board[5][6] == self.opponent:
+        if self.board[0][0] == self.opponent_color or self.board[0][6] == self.opponent_color or self.board[5][0] == self.opponent_color or self.board[5][6] == self.opponent_color:
             score -= 10
 
         for i in range(6):

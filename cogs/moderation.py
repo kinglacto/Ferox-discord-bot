@@ -33,7 +33,7 @@ class Moderation(commands.Cog):
                 return None
 
         date_time = self.now.strftime("%H:%M:%S-%d/%m/%Y")
-        embed = Embed(title=f"🔓 Channel Unocked", description=f"**Unlocked by:** <@{ctx.message.author.id}> \n**Reason:** {reason} \n**Unlocked at:** {date_time}")
+        embed = Embed(title=f"🔓 Channel Unlocked", description=f"**Unlocked by:** <@{ctx.message.author.id}> \n**Reason:** {reason} \n**Unlocked at:** {date_time}")
         await ctx.channel.send(embed=embed)
 
     @commands.command(aliases=["lockdown"])
