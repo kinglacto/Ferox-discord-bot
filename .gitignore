@@ -1,3 +1,4 @@
 .env
 __pycache__/
-*.json
+data/memes.json
+data/users.json
