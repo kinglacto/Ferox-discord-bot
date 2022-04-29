@@ -65,8 +65,6 @@ class Fun(commands.Cog, Data):
                 except:
                     pass
 
-        memes = memes[:501]
-
         self.update_changes(self.memes_path, memes)
         self.memes = self.retrieve(self.memes_path)
         
