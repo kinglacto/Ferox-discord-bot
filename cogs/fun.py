@@ -224,3 +224,4 @@ class Fun(commands.Cog, Data):
     @commands.command(aliases=["8ball"])
     async def ball_8(self, ctx):
         await ctx.reply(f":8ball: {random.choice(self.ball_8_answers)}")
+        
